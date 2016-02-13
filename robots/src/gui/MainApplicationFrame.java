@@ -45,9 +45,7 @@ public class MainApplicationFrame extends JFrame {
                 screenSize.height - inset * 2);
 
         setContentPane(desktopPane);
-
-        LogWindow logWindow = createLogWindow();
-        addWindow(logWindow);
+        addWindow(createLogWindow());
 
         GameWindow gameWindow = new GameWindow();
         gameWindow.setSize(400, 400);
@@ -67,62 +65,55 @@ public class MainApplicationFrame extends JFrame {
         return logWindow;
     }
 
-    // добавление окна
     protected void addWindow(JInternalFrame frame) {
         desktopPane.add(frame);
         frame.setVisible(true);
     }
 
-    // добавление ячейки в строку меню
-    private void addCellInMenuBar(JMenuBar menuBar, String name, int keyEvent, String description, JMenuItem... menuItems) {
+    private JMenuItem menuSubItems(String name, int keyEvent, ActionListener action) {
+        JMenuItem jMenuItem = new JMenuItem(name, keyEvent);
+        jMenuItem.addActionListener(action);
+        return jMenuItem;
+    }
+
+    private JMenu menuItems(String name, int keyEvent, String description, JMenuItem... menuItems) {
         JMenu menu = new JMenu(name);
         menu.setMnemonic(keyEvent);
         menu.getAccessibleContext().setAccessibleDescription(description);
         for (JMenuItem menuItem : menuItems)
             menu.add(menuItem);
-        menuBar.add(menu);
+        return menu;
     }
 
-    // создание строки ячейки
-    private JMenuItem addLineInCellInMenuBar(String name, int keyEvent, ActionListener actionListener) {
-        JMenuItem jMenuItem = new JMenuItem(name, keyEvent);
-        jMenuItem.addActionListener(actionListener);
-        return jMenuItem;
-    }
-
-    // генерация ячейки 'Режим отображения'
-    private void generateCellInMenuBarDisplayMode(JMenuBar menuBar) {
-        JMenuItem systemLookAndFeel = addLineInCellInMenuBar("Системная схема", KeyEvent.VK_S, (event) -> {
+    private JMenu generateMenuItemsDisplayMode() {
+        JMenuItem menuSubItems1 = menuSubItems("Системная схема", KeyEvent.VK_S, (event) -> {
             setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             this.invalidate();
         });
-        JMenuItem crossplatformLookAndFeel = addLineInCellInMenuBar("Универсальная схема", KeyEvent.VK_S, (event) -> {
+        JMenuItem menuSubItems2 = menuSubItems("Универсальная схема", KeyEvent.VK_S, (event) -> {
             setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
             this.invalidate();
         });
-        addCellInMenuBar(menuBar, "Режим отображения", KeyEvent.VK_V, "Управление режимом отображения приложения",
-                systemLookAndFeel, crossplatformLookAndFeel);
+        return menuItems("Режим отображения", KeyEvent.VK_V, "Управление режимом отображения приложения",
+                menuSubItems1, menuSubItems2);
     }
 
-    // генерация ячейки 'Тесты'
-    private void generateCellInMenuBarTest(JMenuBar menuBar) {
-        JMenuItem addLogMessageItem = addLineInCellInMenuBar("Сообщение в лог", KeyEvent.VK_S, (event) ->
+    private JMenu generateMenuItemsTest() {
+        JMenuItem menuSubItems = menuSubItems("Сообщение в лог", KeyEvent.VK_S, (event) ->
                 Logger.debug("Новая строка"));
-        addCellInMenuBar(menuBar, "Тесты", KeyEvent.VK_T, "Тестовые команды", addLogMessageItem);
+        return menuItems("Тесты", KeyEvent.VK_T, "Тестовые команды", menuSubItems);
     }
 
-    // генерация ячейки 'Закрыть'
-    private void generateCellInMenuBarClosedWindow(JMenuBar menuBar) {
-        JMenuItem quitMenuItem = addLineInCellInMenuBar("Закрыть приложение", KeyEvent.VK_Q, (event) -> closingWindow());
-        addCellInMenuBar(menuBar, "Закрыть", KeyEvent.VK_O, "Закрыть", quitMenuItem);
+    private JMenu generateMenuItemsClosedWindow() {
+        JMenuItem menuSubItems = menuSubItems("Закрыть приложение", KeyEvent.VK_Q, (event) -> closingWindow());
+        return menuItems("Закрыть", KeyEvent.VK_O, "Закрыть", menuSubItems);
     }
 
-    // генерация всей строки меню
     private JMenuBar generateMenuBar() {
         JMenuBar menuBar = new JMenuBar();
-        generateCellInMenuBarDisplayMode(menuBar);
-        generateCellInMenuBarTest(menuBar);
-        generateCellInMenuBarClosedWindow(menuBar);
+        menuBar.add(generateMenuItemsDisplayMode());
+        menuBar.add(generateMenuItemsTest());
+        menuBar.add(generateMenuItemsClosedWindow());
         return menuBar;
     }
 
