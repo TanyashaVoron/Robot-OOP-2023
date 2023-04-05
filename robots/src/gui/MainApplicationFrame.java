@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 import javax.swing.*;
@@ -16,7 +17,11 @@ import log.Logger;
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
 
+    // закрытие окна с подтверждением
     public void closingWindow() { // метод закрытия
+        UIManager.put("OptionPane.yesButtonText", "Да"); // кнопочти на русском
+        UIManager.put("OptionPane.noButtonText", "Нет");
+
         int result = JOptionPane.showConfirmDialog(
                 MainApplicationFrame.this,
                 "Закрыть приложение?",
@@ -41,7 +46,6 @@ public class MainApplicationFrame extends JFrame {
 
         setContentPane(desktopPane);
 
-
         LogWindow logWindow = createLogWindow();
         addWindow(logWindow);
 
@@ -51,9 +55,6 @@ public class MainApplicationFrame extends JFrame {
 
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-
-        UIManager.put("OptionPane.yesButtonText", "Да"); // кнопочти на русском
-        UIManager.put("OptionPane.noButtonText", "Нет");
     }
 
     protected LogWindow createLogWindow() {
@@ -66,80 +67,62 @@ public class MainApplicationFrame extends JFrame {
         return logWindow;
     }
 
+    // добавление окна
     protected void addWindow(JInternalFrame frame) {
         desktopPane.add(frame);
         frame.setVisible(true);
     }
 
-//    protected JMenuBar createMenuBar() {
-//        JMenuBar menuBar = new JMenuBar();
-//
-//        //Set up the lone menu.
-//        JMenu menu = new JMenu("Document");
-//        menu.setMnemonic(KeyEvent.VK_D);
-//        menuBar.add(menu);
-//
-//        //Set up the first menu item.
-//        JMenuItem menuItem = new JMenuItem("New");
-//        menuItem.setMnemonic(KeyEvent.VK_N);
-//        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-//                KeyEvent.VK_N, ActionEvent.ALT_MASK));
-//        menuItem.setActionCommand("new");
-////        menuItem.addActionListener(this);
-//        menu.add(menuItem);
-//
-//        //Set up the second menu item.
-//        menuItem = new JMenuItem("Quit");
-//        menuItem.setMnemonic(KeyEvent.VK_Q);
-//        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-//                KeyEvent.VK_Q, ActionEvent.ALT_MASK));
-//        menuItem.setActionCommand("quit");
-////        menuItem.addActionListener(this);
-//        menu.add(menuItem);
-//
-//        return menuBar;
-//    }
+    // добавление ячейки в строку меню
+    private void addCellInMenuBar(JMenuBar menuBar, String name, int keyEvent, String description, JMenuItem... menuItems) {
+        JMenu menu = new JMenu(name);
+        menu.setMnemonic(keyEvent);
+        menu.getAccessibleContext().setAccessibleDescription(description);
+        for (JMenuItem menuItem : menuItems)
+            menu.add(menuItem);
+        menuBar.add(menu);
+    }
 
+    // создание строки ячейки
+    private JMenuItem addLineInCellInMenuBar(String name, int keyEvent, ActionListener actionListener) {
+        JMenuItem jMenuItem = new JMenuItem(name, keyEvent);
+        jMenuItem.addActionListener(actionListener);
+        return jMenuItem;
+    }
+
+    // генерация ячейки 'Режим отображения'
+    private void generateCellInMenuBarDisplayMode(JMenuBar menuBar) {
+        JMenuItem systemLookAndFeel = addLineInCellInMenuBar("Системная схема", KeyEvent.VK_S, (event) -> {
+            setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            this.invalidate();
+        });
+        JMenuItem crossplatformLookAndFeel = addLineInCellInMenuBar("Универсальная схема", KeyEvent.VK_S, (event) -> {
+            setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            this.invalidate();
+        });
+        addCellInMenuBar(menuBar, "Режим отображения", KeyEvent.VK_V, "Управление режимом отображения приложения",
+                systemLookAndFeel, crossplatformLookAndFeel);
+    }
+
+    // генерация ячейки 'Тесты'
+    private void generateCellInMenuBarTest(JMenuBar menuBar) {
+        JMenuItem addLogMessageItem = addLineInCellInMenuBar("Сообщение в лог", KeyEvent.VK_S, (event) ->
+                Logger.debug("Новая строка"));
+        addCellInMenuBar(menuBar, "Тесты", KeyEvent.VK_T, "Тестовые команды", addLogMessageItem);
+    }
+
+    // генерация ячейки 'Закрыть'
+    private void generateCellInMenuBarClosedWindow(JMenuBar menuBar) {
+        JMenuItem quitMenuItem = addLineInCellInMenuBar("Закрыть приложение", KeyEvent.VK_Q, (event) -> closingWindow());
+        addCellInMenuBar(menuBar, "Закрыть", KeyEvent.VK_O, "Закрыть", quitMenuItem);
+    }
+
+    // генерация всей строки меню
     private JMenuBar generateMenuBar() {
         JMenuBar menuBar = new JMenuBar();
-
-        JMenu lookAndFeelMenu = new JMenu("Режим отображения");
-        lookAndFeelMenu.setMnemonic(KeyEvent.VK_V);
-        lookAndFeelMenu.getAccessibleContext().setAccessibleDescription("Управление режимом отображения приложения");
-
-        {
-            JMenuItem systemLookAndFeel = new JMenuItem("Системная схема", KeyEvent.VK_S);
-            systemLookAndFeel.addActionListener((event) -> {
-                setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                this.invalidate();
-            });
-            lookAndFeelMenu.add(systemLookAndFeel);
-        }
-        {
-            JMenuItem crossplatformLookAndFeel = new JMenuItem("Универсальная схема", KeyEvent.VK_S);
-            crossplatformLookAndFeel.addActionListener((event) -> {
-                setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-                this.invalidate();
-            });
-            lookAndFeelMenu.add(crossplatformLookAndFeel);
-        }
-
-        JMenu testMenu = new JMenu("Тесты");
-        testMenu.setMnemonic(KeyEvent.VK_T);
-        testMenu.getAccessibleContext().setAccessibleDescription("Тестовые команды");
-        {
-            JMenuItem addLogMessageItem = new JMenuItem("Сообщение в лог", KeyEvent.VK_S);
-            addLogMessageItem.addActionListener((event) -> Logger.debug("Новая строка"));
-            testMenu.add(addLogMessageItem);
-        }
-
-        JMenuItem jMenuItem = new JMenuItem("Закрыть приложение");
-        jMenuItem.setMnemonic(KeyEvent.VK_Q);
-        jMenuItem.addActionListener((event) -> closingWindow());
-
-        menuBar.add(lookAndFeelMenu);
-        menuBar.add(testMenu);
-        menuBar.add(jMenuItem);
+        generateCellInMenuBarDisplayMode(menuBar);
+        generateCellInMenuBarTest(menuBar);
+        generateCellInMenuBarClosedWindow(menuBar);
         return menuBar;
     }
 
