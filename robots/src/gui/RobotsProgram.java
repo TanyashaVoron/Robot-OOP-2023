@@ -1,5 +1,7 @@
 package gui;
 
+import Language.Russian;
+
 import java.awt.Frame;
 
 import javax.swing.SwingUtilities;
@@ -17,7 +19,7 @@ public class RobotsProgram
         e.printStackTrace();
       }
       SwingUtilities.invokeLater(() -> {
-        MainApplicationFrame frame = new MainApplicationFrame();
+        MainApplicationFrame frame = new MainApplicationFrame(new Russian());
         frame.pack();
         frame.setVisible(true);
         frame.setExtendedState(Frame.MAXIMIZED_BOTH);
