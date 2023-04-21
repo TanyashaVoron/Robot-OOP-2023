@@ -4,21 +4,20 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyVetoException;
+import java.io.IOException;
 
 import javax.swing.*;
 
 import Language.Language;
 import log.Logger;
 
-/**
- * Что требуется сделать:
- * 1. Метод создания меню перегружен функционалом и трудно читается.
- * Следует разделить его на серию более простых методов (или вообще выделить отдельный класс).
- */
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
+    private final LogWindow logWindow = createLogWindow();
+    private final GameWindow gameWindow = createGameWindow();
 
-    public void closingWindow() {
+    public void closingWindow() throws IOException {
         int result = JOptionPane.showConfirmDialog(
                 MainApplicationFrame.this,
                 "Закрыть приложение?",
@@ -28,13 +27,15 @@ public class MainApplicationFrame extends JFrame {
 
         if (result == JOptionPane.YES_OPTION) {
             dispose();
+
+            logWindow.save();
+            gameWindow.save();
+
             System.exit(0);
         }
     }
 
-    public MainApplicationFrame(Language language) {
-        //Make the big window be indented 50 pixels from each edge
-        //of the screen.
+    public MainApplicationFrame(Language language) throws IOException, ClassNotFoundException, PropertyVetoException {
         language.setLocalLanguage();
 
         int inset = 50;
@@ -44,27 +45,38 @@ public class MainApplicationFrame extends JFrame {
                 screenSize.height - inset * 2);
 
         setContentPane(desktopPane);
-        addWindow(createLogWindow());
-
-        addWindow(createGameWindow());
 
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(EXIT_ON_CLOSE);
     }
 
-    protected LogWindow createLogWindow() {
+    protected LogWindow createLogWindow() throws IOException, ClassNotFoundException, PropertyVetoException {
         LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
-        logWindow.setLocation(10, 10);
-        logWindow.setSize(300, 800);
-        setMinimumSize(logWindow.getSize());
-        logWindow.pack();
+        addWindow(logWindow);
+
+        if (logWindow.fileExists()) {
+            logWindow.recondition();
+        } else {
+            logWindow.setLocation(10, 10);
+            logWindow.setSize(300, 800);
+            setMinimumSize(logWindow.getSize());
+            logWindow.pack();
+        }
+
         Logger.debug("Протокол работает");
         return logWindow;
     }
 
-    protected GameWindow createGameWindow() {
+    protected GameWindow createGameWindow() throws IOException, ClassNotFoundException, PropertyVetoException {
         GameWindow gameWindow = new GameWindow();
-        gameWindow.setSize(400, 400);
+        addWindow(gameWindow);
+
+        if (gameWindow.fileExists()) {
+            gameWindow.recondition();
+        } else {
+            gameWindow.setSize(400, 400);
+        }
+
         return gameWindow;
     }
 
@@ -108,7 +120,13 @@ public class MainApplicationFrame extends JFrame {
     }
 
     private JMenu generateMenuItemsClosedWindow() {
-        JMenuItem menuItems = createMenuSubItems("Закрыть приложение", KeyEvent.VK_Q, (event) -> closingWindow());
+        JMenuItem menuItems = createMenuSubItems("Закрыть приложение", KeyEvent.VK_Q, (event) -> {
+            try {
+                closingWindow();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
         return createMenuItems("Закрыть", KeyEvent.VK_O, "Закрыть", menuItems);
     }
 
