@@ -16,6 +16,7 @@ public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
     private final LogWindow logWindow = createLogWindow();
     private final GameWindow gameWindow = createGameWindow();
+    private final GameInfoWindow gameInfoWindow = createGameInfoWindow();
 
     public void closingWindow() throws IOException {
         int result = JOptionPane.showConfirmDialog(
@@ -30,6 +31,7 @@ public class MainApplicationFrame extends JFrame {
 
             logWindow.save();
             gameWindow.save();
+            gameInfoWindow.save();
 
             System.exit(0);
         }
@@ -80,6 +82,17 @@ public class MainApplicationFrame extends JFrame {
         return gameWindow;
     }
 
+    protected GameInfoWindow createGameInfoWindow() throws IOException, ClassNotFoundException, PropertyVetoException {
+        GameInfoWindow gameInfoWindow = new GameInfoWindow(gameWindow);
+        addWindow(gameInfoWindow);
+
+        if (gameInfoWindow.fileExists()) {
+            gameInfoWindow.recondition();
+        }
+
+        gameInfoWindow.setLocation(gameWindow.getLocation().x,gameWindow.getLocation().y-gameInfoWindow.getLocation().y);
+        return gameInfoWindow;
+    }
     protected void addWindow(JInternalFrame frame) {
         desktopPane.add(frame);
         frame.setVisible(true);
