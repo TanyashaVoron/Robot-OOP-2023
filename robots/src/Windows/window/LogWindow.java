@@ -1,4 +1,4 @@
-package gui;
+package Windows.window;
 
 import java.awt.*;
 
@@ -7,9 +7,9 @@ import javax.swing.JPanel;
 import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
-import save.WindowState;
+import Windows.WindowFileState;
 
-public class LogWindow extends WindowState implements LogChangeListener {
+public class LogWindow extends WindowFileState implements LogChangeListener {
     private final LogWindowSource m_logSource;
     private final TextArea m_logContent;
 

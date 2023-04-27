@@ -1,4 +1,6 @@
-package save;
+package Windows;
+
+import save.IObjectState;
 
 import java.io.*;
 import java.awt.Dimension;
@@ -9,10 +11,10 @@ import java.io.FileOutputStream;
 import javax.swing.JInternalFrame;
 
 
-public class WindowState extends JInternalFrame {
+public class WindowFileState extends JInternalFrame implements IObjectState {
     private final String fileName;
 
-    public WindowState(String title, boolean resizable, boolean closable, boolean maximizable, boolean iconable, String name) {
+    public WindowFileState(String title, boolean resizable, boolean closable, boolean maximizable, boolean iconable, String name) {
         super(title, resizable, closable, maximizable, iconable);
         fileName = System.getProperty("user.home") + File.separator + name + ".txt";
     }
@@ -31,7 +33,7 @@ public class WindowState extends JInternalFrame {
         oos.flush();
     }
 
-    public void recondition() throws IOException, ClassNotFoundException, PropertyVetoException {
+    public void load() throws IOException, ClassNotFoundException, PropertyVetoException {
         ObjectInputStream ois = new ObjectInputStream(new BufferedInputStream(new FileInputStream(fileName)));
         setLocation((int) ois.readObject(), (int) ois.readObject());
         setSize((Dimension) ois.readObject());

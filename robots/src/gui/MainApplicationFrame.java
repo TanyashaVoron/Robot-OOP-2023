@@ -10,6 +10,9 @@ import java.io.IOException;
 import javax.swing.*;
 
 import Language.Language;
+import Windows.window.GameInfoWindow;
+import Windows.window.GameWindow;
+import Windows.window.LogWindow;
 import log.Logger;
 
 public class MainApplicationFrame extends JFrame {
@@ -32,6 +35,9 @@ public class MainApplicationFrame extends JFrame {
             logWindow.save();
             gameWindow.save();
             gameInfoWindow.save();
+            //logWindow.del();
+            //gameWindow.del();
+            //gameInfoWindow.del();
 
             System.exit(0);
         }
@@ -57,7 +63,7 @@ public class MainApplicationFrame extends JFrame {
         addWindow(logWindow);
 
         if (logWindow.fileExists()) {
-            logWindow.recondition();
+            logWindow.load();
         } else {
             logWindow.setLocation(10, 10);
             logWindow.setSize(300, 800);
@@ -74,7 +80,7 @@ public class MainApplicationFrame extends JFrame {
         addWindow(gameWindow);
 
         if (gameWindow.fileExists()) {
-            gameWindow.recondition();
+            gameWindow.load();
         } else {
             gameWindow.setSize(400, 400);
         }
@@ -87,10 +93,10 @@ public class MainApplicationFrame extends JFrame {
         addWindow(gameInfoWindow);
 
         if (gameInfoWindow.fileExists()) {
-            gameInfoWindow.recondition();
+            gameInfoWindow.load();
         }
 
-        gameInfoWindow.setLocation(gameWindow.getLocation().x,gameWindow.getLocation().y-gameInfoWindow.getLocation().y);
+        //gameInfoWindow.setLocation(gameWindow.getLocation().x,gameWindow.getLocation().y-gameInfoWindow.getLocation().y);
         return gameInfoWindow;
     }
     protected void addWindow(JInternalFrame frame) {
@@ -157,7 +163,6 @@ public class MainApplicationFrame extends JFrame {
             SwingUtilities.updateComponentTreeUI(this);
         } catch (ClassNotFoundException | InstantiationException
                  | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            // just ignore
         }
     }
 }
