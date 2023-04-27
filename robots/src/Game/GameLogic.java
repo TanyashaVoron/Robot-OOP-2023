@@ -1,4 +1,4 @@
-package gui;
+package Game;
 
 import java.awt.*;
 import java.util.Observable;
@@ -15,22 +15,41 @@ public class GameLogic extends Observable {
     private static double maxVelocity = 0.4;
     private static final double maxAngularVelocity = 0.004;
 
+    private int width;
+    private int height;
+
     public double getM_robotPositionX() {
         return m_robotPositionX;
     }
+
     public double getM_robotPositionY() {
         return m_robotPositionY;
     }
-    public int getM_targetPositionX(){return m_targetPositionX;}
-    public int getM_targetPositionY(){return m_targetPositionY;}
-    public double getM_robotDirection(){return m_robotDirection;}
+
+    public int getM_targetPositionX() {
+        return m_targetPositionX;
+    }
+
+    public int getM_targetPositionY() {
+        return m_targetPositionY;
+    }
+
+    public double getM_robotDirection() {
+        return m_robotDirection;
+    }
+
     protected void setTargetPosition(Point p) {
         m_targetPositionX = p.x;
         m_targetPositionY = p.y;
     }
 
+    public void setSizeFieldRobot(int x, int y) {
+        width = x;
+        height = y;
+    }
+
     private static double distance(double x1, double y1, double x2, double y2) {
-        return Math.sqrt(Math.pow(x1 - x2, 2) + Math. pow(y1 - y2, 2));
+        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
 
     private static double angleTo(double fromX, double fromY, double toX, double toY) {
@@ -93,8 +112,17 @@ public class GameLogic extends Observable {
         m_robotPositionX = newX;
         m_robotPositionY = newY;
         m_robotDirection = asNormalizedRadians(m_robotDirection + angularVelocity * duration);
-        //m_robotDirection = newDirection;
+
+        if (width != 0) {
+            newX = applyLimits(m_robotPositionX, 0, width);
+            m_robotPositionX = newX;
+        }
+        if (height != 0) {
+            newY = applyLimits(m_robotPositionY, 0, height);
+            m_robotPositionY = newY;
+        }
     }
+
     private static double asNormalizedRadians(double angle) {
         while (angle < 0) {
             angle += 2 * Math.PI;

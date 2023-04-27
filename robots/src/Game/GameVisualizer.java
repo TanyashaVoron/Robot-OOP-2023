@@ -1,4 +1,4 @@
-package gui;
+package Game;
 
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -10,11 +10,12 @@ import java.util.TimerTask;
 import javax.swing.JPanel;
 
 public class GameVisualizer extends JPanel {
-    private final Timer m_timer = initTimer();
     private final GameLogic gameLogic = new GameLogic();
+
     private static Timer initTimer() {
         return new Timer("events generator", true);
     }
+
     public GameVisualizer() {
         Timer m_timer = initTimer();
         m_timer.schedule(new TimerTask() {
@@ -51,7 +52,10 @@ public class GameVisualizer extends JPanel {
         });
     }
 
-    public GameLogic getGameLogic(){return gameLogic;}
+    public GameLogic getGameLogic() {
+        return gameLogic;
+    }
+
     protected void onRedrawEvent() {
         EventQueue.invokeLater(this::repaint);
     }

@@ -1,15 +1,18 @@
 package Windows.window;
 
 import Windows.WindowFileState;
-import gui.GameLogic;
-import gui.GameVisualizer;
+import Game.GameLogic;
+import Game.GameVisualizer;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.awt.*;
 
 import javax.swing.JPanel;
 
 public class GameWindow extends WindowFileState {
     private final GameVisualizer m_visualizer;
+
     public GameWindow() {
         super("Игровое поле", true, true, true, true, "GameWindow");
         m_visualizer = new GameVisualizer();
@@ -17,8 +20,20 @@ public class GameWindow extends WindowFileState {
         panel.add(m_visualizer, BorderLayout.CENTER);
         getContentPane().add(panel);
         pack();
+        Timer m_timer = initTimer();
+        m_timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                m_visualizer.getGameLogic().setSizeFieldRobot(panel.getWidth() * 2, panel.getHeight() * 2);
+            }
+        }, 0, 1);
     }
+
     public GameLogic getM_visualizer() {
         return m_visualizer.getGameLogic();
+    }
+
+    private static Timer initTimer() {
+        return new Timer("SizeFieldRobot", true);
     }
 }
