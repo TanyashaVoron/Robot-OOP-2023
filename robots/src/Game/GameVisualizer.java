@@ -10,7 +10,7 @@ import java.util.TimerTask;
 import javax.swing.JPanel;
 
 public class GameVisualizer extends JPanel {
-    private final GameLogic gameLogic = new GameLogic();
+    private final Game game = new Game();
 
     private static Timer initTimer() {
         return new Timer("events generator", true);
@@ -27,13 +27,13 @@ public class GameVisualizer extends JPanel {
         m_timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                gameLogic.onModelUpdateEvent();
+                game.onModelUpdateEvent();
             }
         }, 0, 10);
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                gameLogic.setTargetPosition(e.getPoint());
+                game.setTargetPosition(e.getPoint());
                 repaint();
             }
         });
@@ -46,30 +46,27 @@ public class GameVisualizer extends JPanel {
                 double scale = Toolkit.getDefaultToolkit().getScreenResolution() / 255.0;
                 point.x = (int) (point.x / scale);
                 point.y = (int) (point.y / scale);
-                gameLogic.setTargetPosition(point);
+                game.setTargetPosition(point);
                 repaint();
             }
         });
     }
 
-    public GameLogic getGameLogic() {
-        return gameLogic;
+    public Game getGame() {
+        return game;
     }
 
     protected void onRedrawEvent() {
         EventQueue.invokeLater(this::repaint);
     }
 
-    private static int round(double value) {
-        return (int) (value + 0.5);
-    }
 
     @Override
     public void paint(Graphics g) {
         super.paint(g);
         Graphics2D g2d = (Graphics2D) g;
-        drawRobot(g2d, round(gameLogic.getM_robotPositionX()), round(gameLogic.getM_robotPositionY()), gameLogic.getM_robotDirection());
-        drawTarget(g2d, gameLogic.getM_targetPositionX(), gameLogic.getM_targetPositionY());
+        drawRobot(g2d, Math.round(game.getRobot().getPosition().x), Math.round(game.getRobot().getPosition().y), game.getRobot().getDirection());
+        drawTarget(g2d, game.getTargetPosition().x, game.getTargetPosition().y);
     }
 
     private static void fillOval(Graphics g, int centerX, int centerY, int diam1, int diam2) {
@@ -80,9 +77,9 @@ public class GameVisualizer extends JPanel {
         g.drawOval(centerX - diam1 / 2, centerY - diam2 / 2, diam1, diam2);
     }
 
-    private void drawRobot(Graphics2D g, int x, int y, double direction) {
-        int robotCenterX = round(gameLogic.getM_robotPositionX());
-        int robotCenterY = round(gameLogic.getM_robotPositionY());
+    private void drawRobot(Graphics2D g, int i, int round, double direction) {
+        int robotCenterX = Math.round(game.getRobot().getPosition().x);
+        int robotCenterY = Math.round(game.getRobot().getPosition().y);
         AffineTransform t = AffineTransform.getRotateInstance(direction, robotCenterX, robotCenterY);
         g.setTransform(t);
         g.setColor(Color.MAGENTA);

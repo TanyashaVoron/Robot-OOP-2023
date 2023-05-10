@@ -6,10 +6,10 @@ import java.util.Observer;
 import javax.swing.*;
 
 import Windows.WindowFileState;
-import Game.GameLogic;
+import Game.Game;
 
 public class GameInfoWindow extends WindowFileState implements Observer {
-    private final GameLogic gameLogic;
+    private final Game game;
     private final JTextArea m_text;
 
     public GameInfoWindow(GameWindow gameWindow) {
@@ -17,8 +17,8 @@ public class GameInfoWindow extends WindowFileState implements Observer {
         super.setSize(100, 100);
 
         m_text = new JTextArea("");
-        gameLogic = gameWindow.getM_visualizer();
-        gameLogic.addObserver(this);
+        game = gameWindow.getM_visualizer();
+        game.getRobot().addObserver(this);
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(m_text, BorderLayout.CENTER);
@@ -30,9 +30,9 @@ public class GameInfoWindow extends WindowFileState implements Observer {
 
     @Override
     public void update(Observable observable, Object arg) {
-        if (gameLogic.equals(observable)) {
-            m_text.setText("X = " + (int) gameLogic.getM_robotPositionX()
-                    + " \nY = " + (int) gameLogic.getM_robotPositionY());
+        if (game.getRobot().equals(observable)) {
+            m_text.setText("X = " + game.getRobot().getPosition().x
+                    + " \nY = " + game.getRobot().getPosition().y);
         }
     }
 }

@@ -1,7 +1,7 @@
 package Windows.window;
 
 import Windows.WindowFileState;
-import Game.GameLogic;
+import Game.Game;
 import Game.GameVisualizer;
 
 import java.util.Timer;
@@ -24,13 +24,13 @@ public class GameWindow extends WindowFileState {
         m_timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                m_visualizer.getGameLogic().setSizeFieldRobot(panel.getWidth() * 2, panel.getHeight() * 2);
+                m_visualizer.getGame().setSizeFieldRobot(new Point(panel.getWidth() * 2, panel.getHeight() * 2));
             }
         }, 0, 1);
     }
 
-    public GameLogic getM_visualizer() {
-        return m_visualizer.getGameLogic();
+    public Game getM_visualizer() {
+        return m_visualizer.getGame();
     }
 
     private static Timer initTimer() {
